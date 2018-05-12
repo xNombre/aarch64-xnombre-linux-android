@@ -70,6 +70,7 @@ typedef enum acamera_metadata_section {
     ACAMERA_REPROCESS,
     ACAMERA_DEPTH,
     ACAMERA_LOGICAL_MULTI_CAMERA,
+    ACAMERA_DISTORTION_CORRECTION,
     ACAMERA_SECTION_COUNT,
 
     ACAMERA_VENDOR = 0x8000
@@ -107,6 +108,9 @@ typedef enum acamera_metadata_section_start {
     ACAMERA_DEPTH_START            = ACAMERA_DEPTH             << 16,
     ACAMERA_LOGICAL_MULTI_CAMERA_START
                                    = ACAMERA_LOGICAL_MULTI_CAMERA
+                                                                << 16,
+    ACAMERA_DISTORTION_CORRECTION_START
+                                   = ACAMERA_DISTORTION_CORRECTION
                                                                 << 16,
     ACAMERA_VENDOR_START           = ACAMERA_VENDOR            << 16
 } acamera_metadata_section_start_t;
@@ -1309,8 +1313,8 @@ typedef enum acamera_metadata_tag {
      * Any state (excluding LOCKED) | ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER is START | PRECAPTURE     | Start AE precapture metering sequence
      * Any state (excluding LOCKED) | ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER is CANCEL| INACTIVE       | Currently active precapture metering sequence is canceled</p>
      * <p>If the camera device supports AE external flash mode (ON_EXTERNAL_FLASH is included in
-     * ACAMERA_CONTROL_AE_AVAILABLE_MODES), aeState must be FLASH_REQUIRED after the camera device
-     * finishes AE scan and it's too dark without flash.</p>
+     * ACAMERA_CONTROL_AE_AVAILABLE_MODES), ACAMERA_CONTROL_AE_STATE must be FLASH_REQUIRED after
+     * the camera device finishes AE scan and it's too dark without flash.</p>
      * <p>For the above table, the camera device may skip reporting any state changes that happen
      * without application intervention (i.e. mode switch, trigger, locking). Any state that
      * can be skipped in that manner is called a transient state.</p>
@@ -1331,6 +1335,7 @@ typedef enum acamera_metadata_tag {
      * @see ACAMERA_CONTROL_AE_LOCK
      * @see ACAMERA_CONTROL_AE_MODE
      * @see ACAMERA_CONTROL_AE_PRECAPTURE_TRIGGER
+     * @see ACAMERA_CONTROL_AE_STATE
      * @see ACAMERA_CONTROL_MODE
      * @see ACAMERA_CONTROL_SCENE_MODE
      */
@@ -1908,8 +1913,8 @@ typedef enum acamera_metadata_tag {
      * the thumbnail data will also be rotated.</p>
      * <p>Note that this orientation is relative to the orientation of the camera sensor, given
      * by ACAMERA_SENSOR_ORIENTATION.</p>
-     * <p>To translate from the device orientation given by the Android sensor APIs, the following
-     * sample code may be used:</p>
+     * <p>To translate from the device orientation given by the Android sensor APIs for camera
+     * sensors which are not EXTERNAL, the following sample code may be used:</p>
      * <pre><code>private int getJpegOrientation(CameraCharacteristics c, int deviceOrientation) {
      *     if (deviceOrientation == android.view.OrientationEventListener.ORIENTATION_UNKNOWN) return 0;
      *     int sensorOrientation = c.get(CameraCharacteristics.SENSOR_ORIENTATION);
@@ -1928,6 +1933,8 @@ typedef enum acamera_metadata_tag {
      *     return jpegOrientation;
      * }
      * </code></pre>
+     * <p>For EXTERNAL cameras the sensor orientation will always be set to 0 and the facing will
+     * also be set to EXTERNAL. The above code is not relevant in such case.</p>
      *
      * @see ACAMERA_SENSOR_ORIENTATION
      */
@@ -2256,7 +2263,7 @@ typedef enum acamera_metadata_tag {
      * from the main sensor along the +X axis (to the right from the user's perspective) will
      * report <code>(0.03, 0, 0)</code>.</p>
      * <p>To transform a pixel coordinates between two cameras facing the same direction, first
-     * the source camera ACAMERA_LENS_RADIAL_DISTORTION must be corrected for.  Then the source
+     * the source camera ACAMERA_LENS_DISTORTION must be corrected for.  Then the source
      * camera ACAMERA_LENS_INTRINSIC_CALIBRATION needs to be applied, followed by the
      * ACAMERA_LENS_POSE_ROTATION of the source camera, the translation of the source camera
      * relative to the destination camera, the ACAMERA_LENS_POSE_ROTATION of the destination
@@ -2268,10 +2275,10 @@ typedef enum acamera_metadata_tag {
      * <p>When ACAMERA_LENS_POSE_REFERENCE is GYROSCOPE, then this position is relative to
      * the center of the primary gyroscope on the device.</p>
      *
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
      * @see ACAMERA_LENS_POSE_REFERENCE
      * @see ACAMERA_LENS_POSE_ROTATION
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
      */
     ACAMERA_LENS_POSE_TRANSLATION =                             // float[3]
             ACAMERA_LENS_START + 7,
@@ -2381,7 +2388,7 @@ typedef enum acamera_metadata_tag {
      * where <code>(0,0)</code> is the top-left of the
      * preCorrectionActiveArraySize rectangle. Once the pose and
      * intrinsic calibration transforms have been applied to a
-     * world point, then the ACAMERA_LENS_RADIAL_DISTORTION
+     * world point, then the ACAMERA_LENS_DISTORTION
      * transform needs to be applied, and the result adjusted to
      * be in the ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE coordinate
      * system (where <code>(0, 0)</code> is the top-left of the
@@ -2389,56 +2396,15 @@ typedef enum acamera_metadata_tag {
      * coordinate of the world point for processed (non-RAW)
      * output buffers.</p>
      *
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_LENS_POSE_ROTATION
      * @see ACAMERA_LENS_POSE_TRANSLATION
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
      * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
      */
     ACAMERA_LENS_INTRINSIC_CALIBRATION =                        // float[5]
             ACAMERA_LENS_START + 10,
-    /**
-     * <p>The correction coefficients to correct for this camera device's
-     * radial and tangential lens distortion.</p>
-     *
-     * <p>Type: float[6]</p>
-     *
-     * <p>This tag may appear in:
-     * <ul>
-     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
-     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
-     * </ul></p>
-     *
-     * <p>Four radial distortion coefficients <code>[kappa_0, kappa_1, kappa_2,
-     * kappa_3]</code> and two tangential distortion coefficients
-     * <code>[kappa_4, kappa_5]</code> that can be used to correct the
-     * lens's geometric distortion with the mapping equations:</p>
-     * <pre><code> x_c = x_i * ( kappa_0 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
-     *        kappa_4 * (2 * x_i * y_i) + kappa_5 * ( r^2 + 2 * x_i^2 )
-     *  y_c = y_i * ( kappa_0 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
-     *        kappa_5 * (2 * x_i * y_i) + kappa_4 * ( r^2 + 2 * y_i^2 )
-     * </code></pre>
-     * <p>Here, <code>[x_c, y_c]</code> are the coordinates to sample in the
-     * input image that correspond to the pixel values in the
-     * corrected image at the coordinate <code>[x_i, y_i]</code>:</p>
-     * <pre><code> correctedImage(x_i, y_i) = sample_at(x_c, y_c, inputImage)
-     * </code></pre>
-     * <p>The pixel coordinates are defined in a normalized
-     * coordinate system related to the
-     * ACAMERA_LENS_INTRINSIC_CALIBRATION calibration fields.
-     * Both <code>[x_i, y_i]</code> and <code>[x_c, y_c]</code> have <code>(0,0)</code> at the
-     * lens optical center <code>[c_x, c_y]</code>. The maximum magnitudes
-     * of both x and y coordinates are normalized to be 1 at the
-     * edge further from the optical center, so the range
-     * for both dimensions is <code>-1 &lt;= x &lt;= 1</code>.</p>
-     * <p>Finally, <code>r</code> represents the radial distance from the
-     * optical center, <code>r^2 = x_i^2 + y_i^2</code>, and its magnitude
-     * is therefore no larger than <code>|r| &lt;= sqrt(2)</code>.</p>
-     * <p>The distortion model used is the Brown-Conrady model.</p>
-     *
-     * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
-     */
-    ACAMERA_LENS_RADIAL_DISTORTION =                            // float[6]
+    ACAMERA_LENS_RADIAL_DISTORTION =                            // Deprecated! DO NOT USE
             ACAMERA_LENS_START + 11,
     /**
      * <p>The origin for ACAMERA_LENS_POSE_TRANSLATION.</p>
@@ -2457,6 +2423,51 @@ typedef enum acamera_metadata_tag {
      */
     ACAMERA_LENS_POSE_REFERENCE =                               // byte (acamera_metadata_enum_android_lens_pose_reference_t)
             ACAMERA_LENS_START + 12,
+    /**
+     * <p>The correction coefficients to correct for this camera device's
+     * radial and tangential lens distortion.</p>
+     * <p>Replaces the deprecated ACAMERA_LENS_RADIAL_DISTORTION field, which was
+     * inconsistently defined.</p>
+     *
+     * @see ACAMERA_LENS_RADIAL_DISTORTION
+     *
+     * <p>Type: float[5]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     * </ul></p>
+     *
+     * <p>Three radial distortion coefficients <code>[kappa_1, kappa_2,
+     * kappa_3]</code> and two tangential distortion coefficients
+     * <code>[kappa_4, kappa_5]</code> that can be used to correct the
+     * lens's geometric distortion with the mapping equations:</p>
+     * <pre><code> x_c = x_i * ( 1 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
+     *        kappa_4 * (2 * x_i * y_i) + kappa_5 * ( r^2 + 2 * x_i^2 )
+     *  y_c = y_i * ( 1 + kappa_1 * r^2 + kappa_2 * r^4 + kappa_3 * r^6 ) +
+     *        kappa_5 * (2 * x_i * y_i) + kappa_4 * ( r^2 + 2 * y_i^2 )
+     * </code></pre>
+     * <p>Here, <code>[x_c, y_c]</code> are the coordinates to sample in the
+     * input image that correspond to the pixel values in the
+     * corrected image at the coordinate <code>[x_i, y_i]</code>:</p>
+     * <pre><code> correctedImage(x_i, y_i) = sample_at(x_c, y_c, inputImage)
+     * </code></pre>
+     * <p>The pixel coordinates are defined in a coordinate system
+     * related to the ACAMERA_LENS_INTRINSIC_CALIBRATION
+     * calibration fields; see that entry for details of the mapping stages.
+     * Both <code>[x_i, y_i]</code> and <code>[x_c, y_c]</code>
+     * have <code>(0,0)</code> at the lens optical center <code>[c_x, c_y]</code>, and
+     * the range of the coordinates depends on the focal length
+     * terms of the intrinsic calibration.</p>
+     * <p>Finally, <code>r</code> represents the radial distance from the
+     * optical center, <code>r^2 = x_i^2 + y_i^2</code>.</p>
+     * <p>The distortion model used is the Brown-Conrady model.</p>
+     *
+     * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
+     */
+    ACAMERA_LENS_DISTORTION =                                   // float[5]
+            ACAMERA_LENS_START + 13,
     ACAMERA_LENS_END,
 
     /**
@@ -4211,7 +4222,7 @@ typedef enum acamera_metadata_tag {
      * ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE.</p>
      * <p>The currently supported fields that correct for geometric distortion are:</p>
      * <ol>
-     * <li>ACAMERA_LENS_RADIAL_DISTORTION.</li>
+     * <li>ACAMERA_LENS_DISTORTION.</li>
      * </ol>
      * <p>If all of the geometric distortion fields are no-ops, this rectangle will be the same
      * as the post-distortion-corrected rectangle given in
@@ -4223,7 +4234,7 @@ typedef enum acamera_metadata_tag {
      * full array may include black calibration pixels or other inactive regions.</p>
      * <p>The data representation is <code>int[4]</code>, which maps to <code>(left, top, width, height)</code>.</p>
      *
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_SENSOR_INFO_ACTIVE_ARRAY_SIZE
      * @see ACAMERA_SENSOR_INFO_PIXEL_ARRAY_SIZE
      * @see ACAMERA_SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE
@@ -4798,6 +4809,8 @@ typedef enum acamera_metadata_tag {
      * of points can be less than max (that is, the request doesn't have to
      * always provide a curve with number of points equivalent to
      * ACAMERA_TONEMAP_MAX_CURVE_POINTS).</p>
+     * <p>For devices with MONOCHROME capability, only red channel is used. Green and blue channels
+     * are ignored.</p>
      * <p>A few examples, and their corresponding graphical mappings; these
      * only specify the red channel and the precision is limited to 4
      * digits, for conciseness.</p>
@@ -5280,6 +5293,63 @@ typedef enum acamera_metadata_tag {
             ACAMERA_LOGICAL_MULTI_CAMERA_START + 1,
     ACAMERA_LOGICAL_MULTI_CAMERA_END,
 
+    /**
+     * <p>Mode of operation for the lens distortion correction block.</p>
+     *
+     * <p>Type: byte (acamera_metadata_enum_android_distortion_correction_mode_t)</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraCaptureSession_captureCallback_result callbacks</li>
+     *   <li>ACaptureRequest</li>
+     * </ul></p>
+     *
+     * <p>The lens distortion correction block attempts to improve image quality by fixing
+     * radial, tangential, or other geometric aberrations in the camera device's optics.  If
+     * available, the ACAMERA_LENS_DISTORTION field documents the lens's distortion parameters.</p>
+     * <p>OFF means no distortion correction is done.</p>
+     * <p>FAST/HIGH_QUALITY both mean camera device determined distortion correction will be
+     * applied. HIGH_QUALITY mode indicates that the camera device will use the highest-quality
+     * correction algorithms, even if it slows down capture rate. FAST means the camera device
+     * will not slow down capture rate when applying correction. FAST may be the same as OFF if
+     * any correction at all would slow down capture rate.  Every output stream will have a
+     * similar amount of enhancement applied.</p>
+     * <p>The correction only applies to processed outputs such as YUV, JPEG, or DEPTH16; it is not
+     * applied to any RAW output.  Metadata coordinates such as face rectangles or metering
+     * regions are also not affected by correction.</p>
+     * <p>Applications enabling distortion correction need to pay extra attention when converting
+     * image coordinates between corrected output buffers and the sensor array. For example, if
+     * the app supports tap-to-focus and enables correction, it then has to apply the distortion
+     * model described in ACAMERA_LENS_DISTORTION to the image buffer tap coordinates to properly
+     * calculate the tap position on the sensor active array to be used with
+     * ACAMERA_CONTROL_AF_REGIONS. The same applies in reverse to detected face rectangles if
+     * they need to be drawn on top of the corrected output buffers.</p>
+     *
+     * @see ACAMERA_CONTROL_AF_REGIONS
+     * @see ACAMERA_LENS_DISTORTION
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE =                        // byte (acamera_metadata_enum_android_distortion_correction_mode_t)
+            ACAMERA_DISTORTION_CORRECTION_START,
+    /**
+     * <p>List of distortion correction modes for ACAMERA_DISTORTION_CORRECTION_MODE that are
+     * supported by this camera device.</p>
+     *
+     * @see ACAMERA_DISTORTION_CORRECTION_MODE
+     *
+     * <p>Type: byte[n]</p>
+     *
+     * <p>This tag may appear in:
+     * <ul>
+     *   <li>ACameraMetadata from ACameraManager_getCameraCharacteristics</li>
+     * </ul></p>
+     *
+     * <p>No device is required to support this API; such devices will always list only 'OFF'.
+     * All devices that support this API will list both FAST and HIGH_QUALITY.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_AVAILABLE_MODES =             // byte[n]
+            ACAMERA_DISTORTION_CORRECTION_START + 1,
+    ACAMERA_DISTORTION_CORRECTION_END,
+
 } acamera_metadata_tag_t;
 
 /**
@@ -5500,9 +5570,11 @@ typedef enum acamera_metadata_enum_acamera_control_ae_mode {
      * for the external flash. Otherwise, this mode acts like ON.</p>
      * <p>When the external flash is turned off, AE mode should be changed to one of the
      * other available AE modes.</p>
-     * <p>If the camera device supports AE external flash mode, aeState must be
-     * FLASH_REQUIRED after the camera device finishes AE scan and it's too dark without
+     * <p>If the camera device supports AE external flash mode, ACAMERA_CONTROL_AE_STATE must
+     * be FLASH_REQUIRED after the camera device finishes AE scan and it's too dark without
      * flash.</p>
+     *
+     * @see ACAMERA_CONTROL_AE_STATE
      */
     ACAMERA_CONTROL_AE_MODE_ON_EXTERNAL_FLASH                        = 5,
 
@@ -6938,7 +7010,7 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
      * <li>ACAMERA_LENS_POSE_TRANSLATION</li>
      * <li>ACAMERA_LENS_POSE_ROTATION</li>
      * <li>ACAMERA_LENS_INTRINSIC_CALIBRATION</li>
-     * <li>ACAMERA_LENS_RADIAL_DISTORTION</li>
+     * <li>ACAMERA_LENS_DISTORTION</li>
      * </ul>
      * </li>
      * <li>The ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE entry is listed by this device.</li>
@@ -6956,12 +7028,12 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
      * rate, including depth stall time.</p>
      *
      * @see ACAMERA_DEPTH_DEPTH_IS_EXCLUSIVE
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_LENS_FACING
      * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
      * @see ACAMERA_LENS_POSE_REFERENCE
      * @see ACAMERA_LENS_POSE_ROTATION
      * @see ACAMERA_LENS_POSE_TRANSLATION
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
      */
     ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT              = 8,
 
@@ -6991,7 +7063,7 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
      * <li>ACAMERA_LENS_POSE_ROTATION</li>
      * <li>ACAMERA_LENS_POSE_TRANSLATION</li>
      * <li>ACAMERA_LENS_INTRINSIC_CALIBRATION</li>
-     * <li>ACAMERA_LENS_RADIAL_DISTORTION</li>
+     * <li>ACAMERA_LENS_DISTORTION</li>
      * </ul>
      * </li>
      * <li>The SENSOR_INFO_TIMESTAMP_SOURCE of the logical device and physical devices must be
@@ -7017,14 +7089,20 @@ typedef enum acamera_metadata_enum_acamera_request_available_capabilities {
      * not slow down the frame rate of the capture, as long as the minimum frame duration
      * of the physical and logical streams are the same.</p>
      *
+     * @see ACAMERA_LENS_DISTORTION
      * @see ACAMERA_LENS_INTRINSIC_CALIBRATION
      * @see ACAMERA_LENS_POSE_REFERENCE
      * @see ACAMERA_LENS_POSE_ROTATION
      * @see ACAMERA_LENS_POSE_TRANSLATION
-     * @see ACAMERA_LENS_RADIAL_DISTORTION
      * @see ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE
      */
     ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_LOGICAL_MULTI_CAMERA      = 11,
+
+    /**
+     * <p>The camera device is a monochrome camera that doesn't contain a color filter array,
+     * and the pixel values on U and V planes are all 128.</p>
+     */
+    ACAMERA_REQUEST_AVAILABLE_CAPABILITIES_MONOCHROME                = 12,
 
 } acamera_metadata_enum_android_request_available_capabilities_t;
 
@@ -7673,6 +7751,29 @@ typedef enum acamera_metadata_enum_acamera_logical_multi_camera_sensor_sync_type
     ACAMERA_LOGICAL_MULTI_CAMERA_SENSOR_SYNC_TYPE_CALIBRATED         = 1,
 
 } acamera_metadata_enum_android_logical_multi_camera_sensor_sync_type_t;
+
+
+// ACAMERA_DISTORTION_CORRECTION_MODE
+typedef enum acamera_metadata_enum_acamera_distortion_correction_mode {
+    /**
+     * <p>No distortion correction is applied.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE_OFF                           = 0,
+
+    /**
+     * <p>Lens distortion correction is applied without reducing frame rate
+     * relative to sensor output. It may be the same as OFF if distortion correction would
+     * reduce frame rate relative to sensor.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE_FAST                          = 1,
+
+    /**
+     * <p>High-quality distortion correction is applied, at the cost of
+     * possibly reduced frame rate relative to sensor output.</p>
+     */
+    ACAMERA_DISTORTION_CORRECTION_MODE_HIGH_QUALITY                  = 2,
+
+} acamera_metadata_enum_android_distortion_correction_mode_t;
 
 
 #endif /* __ANDROID_API__ >= 24 */

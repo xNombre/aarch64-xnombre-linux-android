@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+/**
+ * @addtogroup Media
+ * @{
+ */
+
+/**
+ * @file NdkMediaFormat.h
+ */
+
 /*
  * This file defines an NDK API.
  * Do not remove methods.
@@ -100,14 +109,18 @@ extern const char* AMEDIAFORMAT_KEY_COLOR_RANGE;
 extern const char* AMEDIAFORMAT_KEY_COLOR_STANDARD;
 extern const char* AMEDIAFORMAT_KEY_COLOR_TRANSFER;
 extern const char* AMEDIAFORMAT_KEY_COMPLEXITY;
+extern const char* AMEDIAFORMAT_KEY_CSD;
+extern const char* AMEDIAFORMAT_KEY_CSD_0;
+extern const char* AMEDIAFORMAT_KEY_CSD_1;
+extern const char* AMEDIAFORMAT_KEY_CSD_2;
 extern const char* AMEDIAFORMAT_KEY_DISPLAY_CROP;
+extern const char* AMEDIAFORMAT_KEY_DISPLAY_HEIGHT;
+extern const char* AMEDIAFORMAT_KEY_DISPLAY_WIDTH;
 extern const char* AMEDIAFORMAT_KEY_DURATION;
 extern const char* AMEDIAFORMAT_KEY_FLAC_COMPRESSION_LEVEL;
 extern const char* AMEDIAFORMAT_KEY_FRAME_RATE;
-extern const char* AMEDIAFORMAT_KEY_GRID_COLS;
-extern const char* AMEDIAFORMAT_KEY_GRID_HEIGHT;
+extern const char* AMEDIAFORMAT_KEY_GRID_COLUMNS;
 extern const char* AMEDIAFORMAT_KEY_GRID_ROWS;
-extern const char* AMEDIAFORMAT_KEY_GRID_WIDTH;
 extern const char* AMEDIAFORMAT_KEY_HDR_STATIC_INFO;
 extern const char* AMEDIAFORMAT_KEY_HEIGHT;
 extern const char* AMEDIAFORMAT_KEY_INTRA_REFRESH_PERIOD;
@@ -123,6 +136,7 @@ extern const char* AMEDIAFORMAT_KEY_MAX_HEIGHT;
 extern const char* AMEDIAFORMAT_KEY_MAX_INPUT_SIZE;
 extern const char* AMEDIAFORMAT_KEY_MAX_WIDTH;
 extern const char* AMEDIAFORMAT_KEY_MIME;
+extern const char* AMEDIAFORMAT_KEY_MPEG_USER_DATA;
 extern const char* AMEDIAFORMAT_KEY_OPERATING_RATE;
 extern const char* AMEDIAFORMAT_KEY_PCM_ENCODING;
 extern const char* AMEDIAFORMAT_KEY_PRIORITY;
@@ -131,10 +145,16 @@ extern const char* AMEDIAFORMAT_KEY_PUSH_BLANK_BUFFERS_ON_STOP;
 extern const char* AMEDIAFORMAT_KEY_REPEAT_PREVIOUS_FRAME_AFTER;
 extern const char* AMEDIAFORMAT_KEY_ROTATION;
 extern const char* AMEDIAFORMAT_KEY_SAMPLE_RATE;
+extern const char* AMEDIAFORMAT_KEY_SEI;
 extern const char* AMEDIAFORMAT_KEY_SLICE_HEIGHT;
 extern const char* AMEDIAFORMAT_KEY_STRIDE;
+extern const char* AMEDIAFORMAT_KEY_TEMPORAL_LAYER_ID;
 extern const char* AMEDIAFORMAT_KEY_TEMPORAL_LAYERING;
+extern const char* AMEDIAFORMAT_KEY_TILE_HEIGHT;
+extern const char* AMEDIAFORMAT_KEY_TILE_WIDTH;
+extern const char* AMEDIAFORMAT_KEY_TIME_US;
 extern const char* AMEDIAFORMAT_KEY_TRACK_ID;
+extern const char* AMEDIAFORMAT_KEY_TRACK_INDEX;
 extern const char* AMEDIAFORMAT_KEY_WIDTH;
 
 #endif /* __ANDROID_API__ >= 21 */
@@ -153,3 +173,5 @@ void AMediaFormat_setRect(AMediaFormat*, const char* name,
 __END_DECLS
 
 #endif // _NDK_MEDIA_FORMAT_H
+
+/** @} */

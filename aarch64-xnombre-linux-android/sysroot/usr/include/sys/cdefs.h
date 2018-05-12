@@ -289,14 +289,22 @@
 #  endif
 #endif
 
+// As we move some FORTIFY checks to be always on, __bos needs to be
+// always available.
 #if defined(__BIONIC_FORTIFY)
 #  if _FORTIFY_SOURCE == 2
 #    define __bos_level 1
 #  else
 #    define __bos_level 0
 #  endif
-#  define __bosn(s, n) __builtin_object_size((s), (n))
-#  define __bos(s) __bosn((s), __bos_level)
+#else
+#  define __bos_level 0
+#endif
+
+#define __bosn(s, n) __builtin_object_size((s), (n))
+#define __bos(s) __bosn((s), __bos_level)
+
+#if defined(__BIONIC_FORTIFY)
 #  define __bos0(s) __bosn((s), 0)
 #  if defined(__clang__)
 #    define __pass_object_size_n(n) __attribute__((pass_object_size(n)))
@@ -343,21 +351,7 @@
 #  define __BIONIC_INCLUDE_FORTIFY_HEADERS 1
 #endif
 
-/*
- * Used to support clangisms with FORTIFY. Because these change how symbols are
- * emitted, we need to ensure that bionic itself is built fortified. But lots
- * of external code (especially stuff using configure) likes to declare
- * functions directly, and they can't know that the overloadable attribute
- * exists. This leads to errors like:
- *
- * dcigettext.c:151:7: error: redeclaration of 'getcwd' must have the 'overloadable' attribute
- * char *getcwd ();
- *       ^
- *
- * To avoid this and keep such software building, don't use overloadable if
- * we're not using fortify.
- */
-#if defined(__clang__) && defined(__BIONIC_FORTIFY)
+#if defined(__clang__)
 #  define __overloadable __attribute__((overloadable))
 #else
 #  define __overloadable

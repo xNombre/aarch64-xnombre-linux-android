@@ -1,16 +1,21 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# crosstool-NG crosstool-ng-1.23.0-319-gaca85cbb Configuration
+# crosstool-NG 1.23.0-385-g7d3d4d9e-dirty Configuration
 #
 CT_CONFIGURE_has_static_link=y
 CT_CONFIGURE_has_wget=y
 CT_CONFIGURE_has_stat_flavor_GNU=y
 CT_CONFIGURE_has_make_3_81_or_newer=y
-CT_CONFIGURE_has_autoconf_2_63_or_newer=y
-CT_CONFIGURE_has_autoreconf_2_63_or_newer=y
-CT_CONFIGURE_has_automake_1_15_or_newer=y
+CT_CONFIGURE_has_libtool_2_4_or_newer=y
+CT_CONFIGURE_has_libtoolize_2_4_or_newer=y
+CT_CONFIGURE_has_autoreconf_2_65_or_newer=y
 CT_CONFIGURE_has_gnu_m4_1_4_12_or_newer=y
+CT_CONFIGURE_has_svn=y
 CT_CONFIGURE_has_git=y
+CT_CONFIGURE_has_md5sum=y
+CT_CONFIGURE_has_sha1sum=y
+CT_CONFIGURE_has_sha256sum=y
+CT_CONFIGURE_has_sha512sum=y
 CT_CONFIGURE_has_install_with_strip_program=y
 CT_MODULES=y
 
@@ -231,6 +236,7 @@ CT_LINUX_DEVEL_SUBDIR=""
 CT_LINUX_DEVEL_BOOTSTRAP=""
 # CT_LINUX_SRC_CUSTOM is not set
 # CT_LINUX_VERY_NEW is not set
+# CT_LINUX_V_4_16 is not set
 # CT_LINUX_V_4_15 is not set
 # CT_LINUX_V_4_14 is not set
 # CT_LINUX_V_4_13 is not set
@@ -247,7 +253,7 @@ CT_LINUX_V_4_4=y
 # CT_LINUX_V_3_4 is not set
 # CT_LINUX_V_3_2 is not set
 # CT_LINUX_V_2_6_32 is not set
-CT_LINUX_VERSION="4.4.113"
+CT_LINUX_VERSION="4.4.127"
 CT_LINUX_MIRRORS="$(CT_Mirrors kernel.org linux ${CT_LINUX_VERSION})"
 CT_LINUX_ARCHIVE_FILENAME="@{pkg_name}-@{version}"
 CT_LINUX_ARCHIVE_DIRNAME="@{pkg_name}-@{version}"
@@ -344,7 +350,7 @@ CT_ANDROID_NDK_PKG_NAME="android-ndk"
 # CT_ANDROID_NDK_SRC_RELEASE is not set
 # CT_ANDROID_NDK_SRC_DEVEL is not set
 CT_ANDROID_NDK_SRC_CUSTOM=y
-CT_ANDROID_NDK_CUSTOM_LOCATION="${CT_TOP_DIR}/android-ndk-r17-beta1"
+CT_ANDROID_NDK_CUSTOM_LOCATION="${CT_TOP_DIR}/android-ndk"
 CT_ANDROID_NDK_VERY_NEW=y
 # CT_ANDROID_NDK_V_R16B is not set
 # CT_ANDROID_NDK_V_R15C is not set
@@ -385,32 +391,43 @@ CT_CC="gcc"
 CT_CC_CHOICE_KSYM="GCC"
 CT_CC_GCC_PKG_KSYM="GCC"
 CT_GCC_DIR_NAME="gcc"
-CT_GCC_USE_GNU=y
-# CT_GCC_USE_LINARO is not set
-CT_GCC_USE="GCC"
-CT_GCC_PKG_NAME="gcc"
+# CT_GCC_USE_GNU is not set
+CT_GCC_USE_LINARO=y
+CT_GCC_USE="GCC_LINARO"
 # CT_GCC_SRC_RELEASE is not set
-CT_GCC_SRC_DEVEL=y
+# CT_GCC_SRC_DEVEL is not set
 # CT_GCC_DEVEL_VCS_git is not set
-CT_GCC_DEVEL_VCS_svn=y
+# CT_GCC_DEVEL_VCS_svn is not set
 # CT_GCC_DEVEL_VCS_hg is not set
 # CT_GCC_DEVEL_VCS_cvs is not set
-CT_GCC_DEVEL_VCS="svn"
-CT_GCC_DEVEL_URL="svn://gcc.gnu.org/svn/gcc"
-CT_GCC_DEVEL_BRANCH=""
-CT_GCC_DEVEL_REVISION=""
-CT_GCC_DEVEL_SUBDIR=""
-CT_GCC_DEVEL_BOOTSTRAP=""
 # CT_GCC_SRC_CUSTOM is not set
 # CT_GCC_VERY_NEW is not set
-CT_GCC_V_7_3_0=y
+# CT_GCC_V_8_1_0 is not set
+# CT_GCC_V_7_3_0 is not set
 # CT_GCC_V_6_4_0 is not set
-CT_GCC_VERSION="7.3.0"
-CT_GCC_MIRRORS="$(CT_Mirrors GNU gcc/gcc-${CT_GCC_VERSION}) $(CT_Mirrors sourceware gcc/releases/gcc-${CT_GCC_VERSION})"
-CT_GCC_ARCHIVE_FILENAME="@{pkg_name}-@{version}"
-CT_GCC_ARCHIVE_DIRNAME="@{pkg_name}-@{version}"
-CT_GCC_ARCHIVE_FORMATS=".tar.xz .tar.gz"
-CT_GCC_SIGNATURE_FORMAT=""
+CT_GCC_LINARO_PKG_NAME="gcc-linaro"
+# CT_GCC_LINARO_SRC_RELEASE is not set
+CT_GCC_LINARO_SRC_DEVEL=y
+CT_GCC_LINARO_DEVEL_VCS_git=y
+# CT_GCC_LINARO_DEVEL_VCS_svn is not set
+# CT_GCC_LINARO_DEVEL_VCS_hg is not set
+# CT_GCC_LINARO_DEVEL_VCS_cvs is not set
+CT_GCC_LINARO_DEVEL_VCS="git"
+CT_GCC_LINARO_DEVEL_URL="https://git.linaro.org/toolchain/gcc.git"
+CT_GCC_LINARO_DEVEL_BRANCH="linaro-7.3-2018.05-rc1"
+CT_GCC_LINARO_DEVEL_REVISION=""
+CT_GCC_LINARO_DEVEL_SUBDIR=""
+CT_GCC_LINARO_DEVEL_BOOTSTRAP=""
+# CT_GCC_LINARO_SRC_CUSTOM is not set
+CT_GCC_LINARO_VERY_NEW=y
+# CT_GCC_LINARO_V_7_2_2017_11 is not set
+# CT_GCC_LINARO_V_6_4_2017_11 is not set
+CT_GCC_LINARO_VERSION="new"
+CT_GCC_LINARO_MIRRORS="$(CT_Mirrors Linaro gcc ${CT_GCC_LINARO_VERSION})"
+CT_GCC_LINARO_ARCHIVE_FILENAME="@{pkg_name}-@{version}"
+CT_GCC_LINARO_ARCHIVE_DIRNAME="@{pkg_name}-@{version}"
+CT_GCC_LINARO_ARCHIVE_FORMATS=".tar.xz"
+CT_GCC_LINARO_SIGNATURE_FORMAT=""
 CT_GCC_later_than_7=y
 CT_GCC_7_or_later=y
 CT_GCC_later_than_6=y
@@ -530,17 +547,18 @@ CT_ISL_DEVEL_VCS_git=y
 # CT_ISL_DEVEL_VCS_cvs is not set
 CT_ISL_DEVEL_VCS="git"
 CT_ISL_DEVEL_URL="git://repo.or.cz/isl.git"
-CT_ISL_DEVEL_BRANCH=""
+CT_ISL_DEVEL_BRANCH="isl-0.19"
 CT_ISL_DEVEL_REVISION=""
 CT_ISL_DEVEL_SUBDIR=""
 CT_ISL_DEVEL_BOOTSTRAP="./autogen.sh"
 # CT_ISL_SRC_CUSTOM is not set
 # CT_ISL_VERY_NEW is not set
-CT_ISL_V_0_18=y
+CT_ISL_V_0_19=y
+# CT_ISL_V_0_18 is not set
 # CT_ISL_V_0_17_1 is not set
 # CT_ISL_V_0_16_1 is not set
 # CT_ISL_V_0_15 is not set
-CT_ISL_VERSION="0.18"
+CT_ISL_VERSION="0.19"
 CT_ISL_MIRRORS="http://isl.gforge.inria.fr"
 CT_ISL_ARCHIVE_FILENAME="@{pkg_name}-@{version}"
 CT_ISL_ARCHIVE_DIRNAME="@{pkg_name}-@{version}"
@@ -576,17 +594,17 @@ CT_MPC_DEVEL_REVISION=""
 CT_MPC_DEVEL_SUBDIR=""
 CT_MPC_DEVEL_BOOTSTRAP="autoreconf -i"
 # CT_MPC_SRC_CUSTOM is not set
-# CT_MPC_VERY_NEW is not set
-CT_MPC_V_1_1_0=y
+CT_MPC_VERY_NEW=y
+# CT_MPC_V_1_1_0 is not set
 # CT_MPC_V_1_0_3 is not set
-CT_MPC_VERSION="1.1.0"
+CT_MPC_VERSION="new"
 CT_MPC_MIRRORS="http://www.multiprecision.org/downloads $(CT_Mirrors GNU mpc)"
 CT_MPC_ARCHIVE_FILENAME="@{pkg_name}-@{version}"
 CT_MPC_ARCHIVE_DIRNAME="@{pkg_name}-@{version}"
 CT_MPC_ARCHIVE_FORMATS=".tar.gz"
 CT_MPC_SIGNATURE_FORMAT="packed/.sig"
+CT_MPC_later_than_1_1_0=y
 CT_MPC_1_1_0_or_later=y
-CT_MPC_1_1_0_or_older=y
 CT_COMP_LIBS_MPFR=y
 CT_COMP_LIBS_MPFR_PKG_KSYM="MPFR"
 CT_MPFR_DIR_NAME="mpfr"
@@ -604,17 +622,17 @@ CT_MPFR_DEVEL_REVISION=""
 CT_MPFR_DEVEL_SUBDIR=""
 CT_MPFR_DEVEL_BOOTSTRAP="wget -O m4/ax_pthread.m4 \"http://git.savannah.gnu.org/gitweb/?p=autoconf-archive.git;a=blob_plain;f=m4/ax_pthread.m4\" && ./autogen.sh"
 # CT_MPFR_SRC_CUSTOM is not set
-# CT_MPFR_VERY_NEW is not set
-CT_MPFR_V_4_0_0=y
+CT_MPFR_VERY_NEW=y
+# CT_MPFR_V_4_0_1 is not set
 # CT_MPFR_V_3_1_6 is not set
-CT_MPFR_VERSION="4.0.0"
+CT_MPFR_VERSION="new"
 CT_MPFR_MIRRORS="http://www.mpfr.org/mpfr-${CT_MPFR_VERSION} $(CT_Mirrors GNU mpfr)"
 CT_MPFR_ARCHIVE_FILENAME="@{pkg_name}-@{version}"
 CT_MPFR_ARCHIVE_DIRNAME="@{pkg_name}-@{version}"
 CT_MPFR_ARCHIVE_FORMATS=".tar.xz .tar.bz2 .tar.gz .zip"
 CT_MPFR_SIGNATURE_FORMAT="packed/.asc"
+CT_MPFR_later_than_4_0_0=y
 CT_MPFR_4_0_0_or_later=y
-CT_MPFR_4_0_0_or_older=y
 CT_MPFR_later_than_3_0_0=y
 CT_MPFR_3_0_0_or_later=y
 CT_MPFR_REQUIRE_3_0_0_or_later=y

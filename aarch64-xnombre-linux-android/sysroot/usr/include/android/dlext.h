@@ -24,6 +24,11 @@
 #include <sys/types.h>  /* for off64_t */
 
 /**
+ * @addtogroup libdl Dynamic Linker
+ * @{
+ */
+
+/**
  * \file
  * Advanced dynamic library opening support. Most users will want to use
  * the standard [dlopen(3)](http://man7.org/linux/man-pages/man3/dlopen.3.html)
@@ -182,5 +187,7 @@ void* android_dlopen_ext(const char* __filename, int __flags, const android_dlex
 
 
 __END_DECLS
+
+/** @} */
 
 #endif
