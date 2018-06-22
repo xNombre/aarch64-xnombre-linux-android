@@ -2,7 +2,7 @@
 
     It has been auto-edited by fixincludes from:
 
-	"/media/andrzej/LOS/crosstool-ng/x-tools/aarch64-xnombre-linux-android/aarch64-xnombre-linux-android/sysroot/usr/include/stdio.h"
+	"/media/andrzej/3d6937e7-05a1-47ad-bd2e-7272666a67de/crosstool-ng/x-tools/aarch64-xnombre-linux-android/aarch64-xnombre-linux-android/sysroot/usr/include/stdio.h"
 
     This had to be done to correct non-standard usages in the
     original, manufacturer supplied header file.  */

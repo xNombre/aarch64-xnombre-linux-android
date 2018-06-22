@@ -7,7 +7,7 @@ OUTPUT_FORMAT("elf32-bigaarch64", "elf32-bigaarch64",
 	      "elf32-littleaarch64")
 OUTPUT_ARCH(aarch64:ilp32)
 ENTRY(_start)
-SEARCH_DIR("=/media/andrzej/LOS/crosstool-ng/x-tools/aarch64-xnombre-linux-android/aarch64-xnombre-linux-android/lib");
+SEARCH_DIR("=/media/andrzej/3d6937e7-05a1-47ad-bd2e-7272666a67de/crosstool-ng/x-tools/aarch64-xnombre-linux-android/aarch64-xnombre-linux-android/lib");
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
@@ -144,7 +144,7 @@ SECTIONS
   .got.plt        : { *(.got.plt)  *(.igot.plt) }
   .data           :
   {
-    __data_start = . ;
+    __data_start = .;
     *(.data .data.* .gnu.linkonce.d.*)
     SORT(CONSTRUCTORS)
   }
@@ -165,11 +165,11 @@ SECTIONS
       pad the .data section.  */
    . = ALIGN(. != 0 ? 32 / 8 : 1);
   }
-  _bss_end__ = . ; __bss_end__ = . ;
+  _bss_end__ = .; __bss_end__ = .;
   . = ALIGN(32 / 8);
   . = SEGMENT_START("ldata-segment", .);
   . = ALIGN(32 / 8);
-  __end__ = . ;
+  __end__ = .;
   _end = .; PROVIDE (end = .);
   .stack         0x80000 :
   {

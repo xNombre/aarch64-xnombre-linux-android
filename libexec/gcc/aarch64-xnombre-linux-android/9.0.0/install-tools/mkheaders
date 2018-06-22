@@ -53,7 +53,7 @@ if [ x$1 != x ] ; then
   prefix=$1
   shift
 else
-  prefix=/media/andrzej/LOS/crosstool-ng/x-tools/aarch64-xnombre-linux-android
+  prefix=/media/andrzej/3d6937e7-05a1-47ad-bd2e-7272666a67de/crosstool-ng/x-tools/aarch64-xnombre-linux-android
 fi
 
 # Allow for alternate isysroot in which to find headers

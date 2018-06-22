@@ -1,8 +1,0 @@
-A repository of self compiled aarch64 toolchain package dedicated for Soda kernel.
-This is pure clean compiler created using a wonderful package - crostool-ng.
-
-It's best because:
-- it's mine
-- it's the latest one.
-
-If you're curious about my config, you will find it in files tree.
